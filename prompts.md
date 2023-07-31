@@ -1,0 +1,1 @@
+A time traveler goes back to the 1980s to prevent a catastrophic event, but falls in love with someone from the past and must choose between saving the world or staying with them
