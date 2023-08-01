@@ -48,7 +48,8 @@ async function fetchBotReply(outline) {
 async function fetchSynopsis(outline) {
   const response = await openai.createCompletion({
     model: 'text-davinci-003',
-    prompt: `Generate an engaging, professional and marketable movie synopsis for a movie based on the following an outline
+    prompt: `Generate an engaging, professional and marketable movie synopsis for a movie based on the following an outline. The synopsis
+    should include actors names in parentheses after each character. Choose actors that would be ideal for this role
     ###
     outline: A big-headed daredevil fighter pilot goes back to school only to be sent on a deadly mission.
     synopsis: The Top Gun Naval Fighter Weapons School is where the best of the best train to refine their elite
@@ -70,6 +71,9 @@ async function fetchSynopsis(outline) {
   const synopsis = response.data.choices[0].text.trim();
   document.getElementById('output-text').innerText = synopsis;
   fetchTitle(synopsis);
+
+  document.getElementById('output-stars').innerText =
+    extractSubstringsBetweenParentheses(synopsis);
 }
 
 async function fetchTitle(synopsis) {
@@ -84,4 +88,25 @@ async function fetchTitle(synopsis) {
 
   document.getElementById('output-title').innerText =
     response.data.choices[0].text.trim();
+}
+
+function extractSubstringsBetweenParentheses(inputString) {
+  let result = '';
+  let substringStartIndex = 0;
+  const stack = [];
+
+  for (let i = 0; i < inputString.length; i++) {
+    if (inputString[i] === '(') {
+      if (stack.length === 0) substringStartIndex = i + 1;
+      stack.push(i);
+    } else if (inputString[i] === ')') {
+      if (stack.length === 1) {
+        if (result.length > 0) result += ', ';
+        result += inputString.slice(substringStartIndex, i);
+      }
+      stack.pop();
+    }
+  }
+
+  return result;
 }
